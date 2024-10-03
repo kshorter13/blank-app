@@ -39,9 +39,6 @@ landmark_a = st.selectbox('Select first landmark', landmark_options, index=mp_po
 landmark_b = st.selectbox('Select middle landmark', landmark_options, index=mp_pose.PoseLandmark.RIGHT_ELBOW.value)
 landmark_c = st.selectbox('Select end landmark', landmark_options, index=mp_pose.PoseLandmark.RIGHT_WRIST.value)
 
-# WebRTC configuration
-RTC_CONFIGURATION = RTCConfiguration({"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]})
-
 class VideoProcessor(VideoProcessorBase):
     def __init__(self):
         self.pose = mp_pose.Pose(
@@ -54,9 +51,9 @@ class VideoProcessor(VideoProcessorBase):
         image = frame.to_ndarray(format="bgr24")
 
         # Convert the BGR image to RGB.
-        image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        image.flags.writeable = False
-        results = self.pose.process(image)
+        image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        image_rgb.flags.writeable = False
+        results = self.pose.process(image_rgb)
 
         if results.pose_landmarks:
             landmarks = [(lm.x, lm.y, lm.z) for lm in results.pose_landmarks.landmark]
@@ -73,17 +70,14 @@ class VideoProcessor(VideoProcessorBase):
             stangle.markdown(f"<h1 style='color: black;'>{angle:.2f}°</h1>", unsafe_allow_html=True)
 
             # Draw the pose annotations on the image.
-            image.flags.writeable = True
-            image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
-            mp_drawing.draw_landmarks(
-                image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS
-            )
+            image_rgb.flags.writeable = True
+            image = cv2.cvtColor(image_rgb, cv2.COLOR_RGB2BGR)
+            mp_drawing.draw_landmarks(image, results.pose_landmarks, mp_pose.POSE_CONNECTIONS)
 
         return av.VideoFrame.from_ndarray(image, format="bgr24")
 
 webrtc_streamer(
     key="example",
-    rtc_configuration=RTC_CONFIGURATION,
     video_processor_factory=VideoProcessor,
     media_stream_constraints={"video": True, "audio": False}
 )

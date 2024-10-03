@@ -2,7 +2,7 @@ import cv2
 import mediapipe as mp
 import numpy as np
 import streamlit as st
-from streamlit_webrtc import webrtc_streamer, VideoProcessorBase, RTCConfiguration
+from streamlit_webrtc import webrtc_streamer, VideoProcessorBase
 import av
 
 mp_drawing = mp.solutions.drawing_utils
@@ -76,6 +76,7 @@ class VideoProcessor(VideoProcessorBase):
 
         return av.VideoFrame.from_ndarray(image, format="bgr24")
 
+# Using default webcam
 webrtc_streamer(
     key="example",
     video_processor_factory=VideoProcessor,

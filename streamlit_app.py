@@ -7,10 +7,6 @@ import av
 
 mp_drawing = mp.solutions.drawing_utils
 mp_pose = mp.solutions.pose
-landmarks_list = []
-
-# Lists to store joint angle data
-angles = []
 
 # Function to calculate angle between three points
 def calculate_angle(a, b, c):
@@ -18,7 +14,7 @@ def calculate_angle(a, b, c):
     b = np.array(b)  # Middle point
     c = np.array(c)  # End point
 
-    radians = np.arctan2(c - b, c - b) - np.arctan2(a - b, a - b)
+    radians = np.arctan2(c[1] - b[1], c[0] - b[0]) - np.arctan2(a[1] - b[1], a[0] - b[0])
     angle = np.abs(radians * 180.0 / np.pi)
 
     if angle > 180.0:
@@ -64,7 +60,6 @@ class VideoProcessor(VideoProcessorBase):
 
         if results.pose_landmarks:
             landmarks = [(lm.x, lm.y, lm.z) for lm in results.pose_landmarks.landmark]
-            landmarks_list.append(landmarks)
 
             # Extract selected landmarks
             point_a = landmarks[mp_pose.PoseLandmark[landmark_a].value]
@@ -73,7 +68,6 @@ class VideoProcessor(VideoProcessorBase):
 
             # Calculate the angle
             angle = calculate_angle(point_a, point_b, point_c)
-            angles.append(angle)
 
             # Display the angle
             stangle.markdown(f"<h1 style='color: black;'>{angle:.2f}°</h1>", unsafe_allow_html=True)

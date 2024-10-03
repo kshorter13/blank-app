@@ -45,7 +45,7 @@ landmark_c = st.selectbox('Select end landmark', landmark_options, index=mp_pose
 available_cams = [i for i in range(10) if cv2.VideoCapture(i).isOpened()]
 selected_cam = st.selectbox('Select webcam', available_cams, index=0)
 
-cap = cv2.VideoCapture(selected_cam)
+cap = cv2.VideoCapture(0)
 
 with mp_pose.Pose(
     model_complexity=1,
